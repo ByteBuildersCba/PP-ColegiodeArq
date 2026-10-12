@@ -1,7 +1,38 @@
 import uuid
-from django.db import models
-from django.core.exceptions import ValidationError
 from datetime import date, timedelta
+from django.db import models
+from django.contrib.auth.models import User
+from django.core.exceptions import ValidationError
+
+
+class PadronColegio(models.Model):
+    """
+    Padrón oficial del Colegio de Arquitectos de Córdoba para validar
+    si una matrícula está registrada y vigente antes de permitir el registro.
+    """
+    ESTADO_CHOICES = [
+        ('HABILITADA', 'Matrícula Habilitada - Vigente'),
+        ('SUSPENDIDA', 'Matrícula Suspendida / Mora'),
+        ('INACTIVA', 'Matrícula Inactiva / Baja'),
+    ]
+
+    numero_matricula = models.CharField(max_length=50, unique=True)
+    nombre_titular = models.CharField(max_length=200)
+    dni = models.CharField(max_length=20, blank=True)
+    estado_vigencia = models.CharField(max_length=50, choices=ESTADO_CHOICES, default='HABILITADA')
+    vigente_hasta = models.DateField(default=date(2027, 12, 31))
+
+    class Meta:
+        verbose_name = 'Padrón de Arquitecto'
+        verbose_name_plural = 'Padrón de Arquitectos'
+        ordering = ['numero_matricula']
+
+    def __str__(self):
+        return f"{self.numero_matricula} - {self.nombre_titular} ({self.estado_vigencia})"
+
+    @property
+    def esta_vigente(self):
+        return self.estado_vigencia == 'HABILITADA' and (self.vigente_hasta >= date.today())
 
 
 class Sede(models.Model):
@@ -58,12 +89,33 @@ class Herramienta(models.Model):
         ordering = ['nombre']
 
     def __str__(self):
-        return f"{self.nombre} (Stock: {self.stock_disponible}/{self.stock_total})"
+        return f"{self.nombre} (Stock Total: {self.stock_disponible}/{self.stock_total})"
+
+
+class StockSede(models.Model):
+    """
+    Control de stock individual por sede: Córdoba, Villa Allende y Jesús María.
+    Permite al administrador gestionar existencias en cada punto.
+    """
+    herramienta = models.ForeignKey(Herramienta, on_delete=models.CASCADE, related_name='stock_sedes')
+    sede = models.ForeignKey(Sede, on_delete=models.CASCADE, related_name='stock_herramientas')
+    stock_total = models.PositiveIntegerField(default=1)
+    stock_disponible = models.PositiveIntegerField(default=1)
+
+    class Meta:
+        unique_together = ('herramienta', 'sede')
+        verbose_name = 'Stock por Sede'
+        verbose_name_plural = 'Stock por Sedes'
+        ordering = ['sede', 'herramienta']
+
+    def __str__(self):
+        return f"{self.herramienta.nombre} en {self.sede.nombre}: {self.stock_disponible}/{self.stock_total}"
 
 
 class Matriculado(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE, null=True, blank=True, related_name='matriculado')
     nombre_completo = models.CharField(max_length=200, default='Arq. Damián Coronda')
-    numero_matricula = models.CharField(max_length=50, default='M1')
+    numero_matricula = models.CharField(max_length=50, default='M1', unique=True)
     estado_matricula = models.CharField(max_length=100, default='Matrícula Habilitada - M1')
     email = models.EmailField(default='damian.coronda@colegioarq.org.ar')
     telefono = models.CharField(max_length=50, default='+54 9 351 555-0192')
@@ -80,6 +132,30 @@ class Matriculado(models.Model):
     @property
     def reservas_activas_count(self):
         return self.reservas.filter(estado__in=['CONFIRMADA', 'RETIRADA']).count()
+
+
+class UsuarioPerfil(models.Model):
+    """
+    Perfil ampliado de usuario para roles: Arquitecto o Administrador de Pañol.
+    """
+    ROL_CHOICES = [
+        ('ARQUITECTO', 'Arquitecto Matriculado'),
+        ('ADMIN_PANOL', 'Administrador de Pañol / Sedes'),
+    ]
+
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='perfil')
+    rol = models.CharField(max_length=30, choices=ROL_CHOICES, default='ARQUITECTO')
+    matriculado = models.ForeignKey(Matriculado, on_delete=models.SET_NULL, null=True, blank=True, related_name='perfiles')
+    numero_matricula = models.CharField(max_length=50, blank=True, default='')
+    estado_matricula = models.CharField(max_length=100, blank=True, default='')
+    sede_asignada = models.ForeignKey(Sede, on_delete=models.SET_NULL, null=True, blank=True, related_name='administradores')
+
+    class Meta:
+        verbose_name = 'Perfil de Usuario'
+        verbose_name_plural = 'Perfiles de Usuario'
+
+    def __str__(self):
+        return f"{self.user.username} ({self.get_rol_display()})"
 
 
 class Reserva(models.Model):
@@ -112,38 +188,40 @@ class Reserva(models.Model):
             short_id = uuid.uuid4().hex[:6].upper()
             self.codigo = f"R1-{date.today().strftime('%y%m%d')}-{short_id}"
         
-        # Calculate days if not provided
         if self.fecha_inicio and self.fecha_devolucion:
             diff = (self.fecha_devolucion - self.fecha_inicio).days + 1
             self.dias_solicitados = max(1, diff)
 
         super().save(*args, **kwargs)
 
-    def clean(self):
-        # Validation 1: Comodato must be accepted
-        if not self.comodato_aceptado:
-            raise ValidationError("Debe aceptar el Contrato de Comodato para formalizar la reserva.")
-
-        # Validation 2: Max 3 days
-        if self.fecha_inicio and self.fecha_devolucion:
-            if self.fecha_devolucion < self.fecha_inicio:
-                raise ValidationError("La fecha de devolución no puede ser anterior a la de inicio.")
-            diff = (self.fecha_devolucion - self.fecha_inicio).days + 1
-            if diff > 3:
-                raise ValidationError(f"El préstamo no puede superar el límite de 3 días (solicitado: {diff} días).")
-
-        # Validation 3: Maximum 2 simultaneous active reservations per architect
-        if self.matriculado:
-            activas = self.matriculado.reservas.filter(estado__in=['CONFIRMADA', 'RETIRADA'])
-            if self.pk:
-                activas = activas.exclude(pk=self.pk)
-            if activas.count() >= 2:
-                raise ValidationError("Ha alcanzado el límite máximo permitido de 2 equipos reservados en simultáneo.")
-
-        # Validation 4: Stock check
-        if self.herramienta and not self.pk:
-            if self.herramienta.stock_disponible <= 0:
-                raise ValidationError(f"No hay stock disponible para '{self.herramienta.nombre}'.")
-
     def __str__(self):
         return f"{self.codigo} - {self.herramienta.nombre} ({self.matriculado.nombre_completo})"
+
+
+class ControlDevolucion(models.Model):
+    """
+    Control de condiciones de herramientas devueltas por parte del usuario admin/pañol.
+    """
+    ESTADO_CONDICION_CHOICES = [
+        ('OPTIMO', 'Óptimo estado (sin observaciones)'),
+        ('BUENO', 'Buen estado (desgaste normal de obra)'),
+        ('CON_DANO', 'Con daño técnico / requiere reparación'),
+        ('INCOMPLETO', 'Incompleto / faltante de accesorios o valija'),
+    ]
+
+    reserva = models.OneToOneField(Reserva, on_delete=models.CASCADE, related_name='control_devolucion')
+    fecha_inspeccion = models.DateTimeField(auto_now_add=True)
+    estado_condicion = models.CharField(max_length=30, choices=ESTADO_CONDICION_CHOICES, default='OPTIMO')
+    checklist_baterias = models.BooleanField(default=True, verbose_name="Baterías y cargador completos")
+    checklist_accesorios = models.BooleanField(default=True, verbose_name="Accesorios completos")
+    checklist_limpieza = models.BooleanField(default=True, verbose_name="Limpieza adecuada")
+    checklist_maletin = models.BooleanField(default=True, verbose_name="Maletín / valija en condiciones")
+    observaciones = models.TextField(blank=True)
+    inspeccionado_por = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
+
+    class Meta:
+        verbose_name = 'Control de Devolución'
+        verbose_name_plural = 'Controles de Devolución'
+
+    def __str__(self):
+        return f"Control {self.reserva.codigo} - {self.get_estado_condicion_display()}"

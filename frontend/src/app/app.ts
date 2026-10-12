@@ -7,7 +7,10 @@ import { ReservaDrawerComponent } from './components/reserva-drawer/reserva-draw
 import { ComodatoModalComponent } from './components/comodato-modal/comodato-modal.component';
 import { MisReservasModalComponent } from './components/mis-reservas-modal/mis-reservas-modal.component';
 import { WhatsappButtonComponent } from './components/whatsapp-button/whatsapp-button.component';
+import { AuthModalComponent } from './components/auth-modal/auth-modal.component';
+import { AdminPanelComponent } from './components/admin-panel/admin-panel.component';
 import { HerramientasService } from './services/herramientas.service';
+import { AuthService } from './services/auth.service';
 import { Herramienta, Reserva } from './models/herramienta.model';
 
 @Component({
@@ -21,7 +24,9 @@ import { Herramienta, Reserva } from './models/herramienta.model';
     ReservaDrawerComponent,
     ComodatoModalComponent,
     MisReservasModalComponent,
-    WhatsappButtonComponent
+    WhatsappButtonComponent,
+    AuthModalComponent,
+    AdminPanelComponent
   ],
   templateUrl: './app.html',
   styleUrls: ['./app.css']
@@ -31,11 +36,18 @@ export class App {
   drawerVisible = signal(false);
   herramientaSeleccionada = signal<Herramienta | null>(null);
 
-  // Modales adicionales
+  // Modales
   comodatoModalVisible = signal(false);
   misReservasModalVisible = signal(false);
+  authModalVisible = signal(false);
 
-  constructor(public herramientasService: HerramientasService) {}
+  // Alternar vista del panel de administración
+  vistaAdminVisible = signal(false);
+
+  constructor(
+    public herramientasService: HerramientasService,
+    public authService: AuthService
+  ) {}
 
   abrirReserva(herramienta: Herramienta): void {
     this.herramientaSeleccionada.set(herramienta);
@@ -62,7 +74,19 @@ export class App {
     this.misReservasModalVisible.set(false);
   }
 
+  abrirAuth(): void {
+    this.authModalVisible.set(true);
+  }
+
+  cerrarAuth(): void {
+    this.authModalVisible.set(false);
+  }
+
+  toggleVistaAdmin(): void {
+    this.vistaAdminVisible.update(v => !v);
+  }
+
   onReservaConfirmada(reserva: Reserva): void {
-    // Si se desea ejecutar acciones adicionales al confirmar
+    // Si se desea ejecutar acciones adicionales
   }
 }

@@ -2,6 +2,7 @@ import { Component, Output, EventEmitter } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HerramientasService } from '../../services/herramientas.service';
+import { AuthService } from '../../services/auth.service';
 import { Sede } from '../../models/herramienta.model';
 
 @Component({
@@ -13,10 +14,16 @@ import { Sede } from '../../models/herramienta.model';
 })
 export class HeaderComponent {
   @Output() abrirMisReservas = new EventEmitter<void>();
+  @Output() abrirAuth = new EventEmitter<void>();
+  @Output() toggleVistaAdmin = new EventEmitter<void>();
 
   menuHerramientasAbierto = false;
+  menuUsuarioAbierto = false;
 
-  constructor(public herramientasService: HerramientasService) {}
+  constructor(
+    public herramientasService: HerramientasService,
+    public authService: AuthService
+  ) {}
 
   onSedeChange(event: Event): void {
     const select = event.target as HTMLSelectElement;
@@ -28,5 +35,9 @@ export class HeaderComponent {
 
   toggleMenuHerramientas(): void {
     this.menuHerramientasAbierto = !this.menuHerramientasAbierto;
+  }
+
+  toggleMenuUsuario(): void {
+    this.menuUsuarioAbierto = !this.menuUsuarioAbierto;
   }
 }

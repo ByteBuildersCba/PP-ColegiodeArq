@@ -10,7 +10,9 @@
       <!-- Menú de enlaces institucionales -->
       <nav class="d-none d-lg-flex align-items-center gap-1 menu-links">
         <a href="#" class="nav-item-link">El Colegio <i class="bi bi-chevron-down ms-1 text-muted"></i></a>
-        <a href="#" class="nav-item-link btn-autogestion">Autogestión</a>
+        <button type="button" class="nav-item-link btn-autogestion border-0" (click)="abrirAuth.emit()">
+          Autogestión
+        </button>
         <a href="#" class="nav-item-link">Ejercicio P. <i class="bi bi-chevron-down ms-1 text-muted"></i></a>
         <a href="#" class="nav-item-link">Novedades <i class="bi bi-chevron-down ms-1 text-muted"></i></a>
 
@@ -48,8 +50,22 @@
         <a href="#" class="nav-item-link">Contacto</a>
       </nav>
 
-      <!-- Botón de búsqueda de sitio / Mis Reservas -->
+      <!-- Botones de Acción: Modo Admin / Mis Reservas / Autenticación -->
       <div class="d-flex align-items-center gap-2">
+        
+        <!-- Botón Toggle Admin (si el usuario es Admin o quiere alternar) -->
+        @if (authService.isAdmin()) {
+          <button
+            type="button"
+            class="btn btn-sm btn-dark d-inline-flex align-items-center gap-1.5 shadow-sm fw-bold"
+            (click)="toggleVistaAdmin.emit()"
+            title="Panel de administración de stock y pañol">
+            <i class="bi bi-shield-check text-warning"></i>
+            <span class="d-none d-sm-inline">Panel Pañol</span>
+          </button>
+        }
+
+        <!-- Botón Mis Reservas -->
         <button
           type="button"
           class="btn btn-sm btn-outline-secondary d-none d-sm-inline-flex align-items-center gap-1 mis-reservas-pill"
@@ -59,7 +75,18 @@
           <span>Mis Reservas</span>
           <span class="badge bg-primary rounded-pill ms-1">{{ herramientasService.reservasActivasCount() }}/2</span>
         </button>
-        <button type="button" class="btn btn-icon-search" aria-label="Buscar en el portal">
+
+        <!-- Botón de Usuario / Iniciar Sesión -->
+        <button
+          type="button"
+          class="btn btn-sm btn-outline-primary d-inline-flex align-items-center gap-1.5 fw-semibold"
+          (click)="abrirAuth.emit()"
+          title="Iniciar sesión o registrar matrícula">
+          <i class="bi bi-person-circle"></i>
+          <span class="d-none d-md-inline">{{ authService.usuarioActual().nombre.split(' ')[1] || 'Cuenta' }}</span>
+        </button>
+
+        <button type="button" class="btn btn-icon-search d-none d-lg-inline-flex" aria-label="Buscar en el portal">
           <i class="bi bi-search"></i>
         </button>
       </div>
@@ -95,13 +122,28 @@
         </div>
       </div>
 
-      <!-- Datos del Matriculado y Estado -->
+      <!-- Datos del Usuario Logueado (Matriculado o Admin) -->
       <div class="d-flex align-items-center gap-2 user-matriculado-info">
-        <span class="fw-semibold text-dark">{{ herramientasService.matriculado().nombre_completo }}</span>
-        <span class="badge-matricula-habilitada d-inline-flex align-items-center gap-1">
-          <i class="bi bi-patch-check-fill text-success"></i>
-          <span>{{ herramientasService.matriculado().estado_matricula }}</span>
-        </span>
+        <span class="fw-semibold text-dark">{{ authService.usuarioActual().nombre }}</span>
+        
+        @if (authService.isAdmin()) {
+          <span class="badge bg-dark text-warning d-inline-flex align-items-center gap-1 font-monospace">
+            <i class="bi bi-shield-fill"></i> Admin Pañol
+          </span>
+        } @else {
+          <span class="badge-matricula-habilitada d-inline-flex align-items-center gap-1">
+            <i class="bi bi-patch-check-fill text-success"></i>
+            <span>{{ authService.usuarioActual().estado_matricula }}</span>
+          </span>
+        }
+
+        <button
+          type="button"
+          class="btn btn-link btn-sm text-secondary p-0 text-decoration-none ms-1 text-xs"
+          (click)="abrirAuth.emit()"
+          title="Cambiar usuario o registrarse">
+          (Cambiar)
+        </button>
       </div>
 
     </div>
