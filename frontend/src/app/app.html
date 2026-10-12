@@ -1,0 +1,121 @@
+<div class="min-vh-100 d-flex flex-column app-layout">
+  
+  <!-- Header Institucional con Selector de Sede y Matriculado -->
+  <app-header (abrirMisReservas)="abrirMisReservas()"></app-header>
+
+  <!-- Contenido Principal: Fondo #EFEFEF (Gris Claro de Sección) -->
+  <main class="main-content flex-grow-1 py-4 py-lg-5">
+    <div class="container-xl">
+
+      <!-- Sección Título Principal del Módulo -->
+      <section class="page-title-section pb-4 mb-4 border-bottom border-secondary-subtle">
+        <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-end gap-3">
+          <div>
+            <span class="badge bg-primary text-uppercase font-monospace mb-2 text-xs">
+              Módulo Institucional Regional 1
+            </span>
+            <h1 class="display-6 fw-semibold text-dark m-0 tracking-tight">
+              Préstamo de Herramientas
+            </h1>
+          </div>
+          <div class="text-md-end">
+            <span class="text-muted small d-block">Sistema Oficial de Instrumental Técnico</span>
+            <span class="fw-semibold text-primary small">
+              Colegio de Arquitectos de la Provincia de Córdoba
+            </span>
+          </div>
+        </div>
+      </section>
+
+      <!-- Subtítulo y Descripción de la Sede Activa -->
+      <section class="mb-4">
+        <h2 class="fs-4 fw-normal text-dark tracking-tight pb-2 border-bottom border-light-subtle">
+          Caja de Herramientas R1: Catálogo de equipos
+        </h2>
+        <p class="text-secondary max-w-2xl mt-2 mb-0 leading-relaxed">
+          Reservá instrumental técnico para tus relevamientos y verificaciones de obra. Retiro y devolución en
+          <strong class="text-dark">{{ herramientasService.sedeSeleccionada().nombre }}</strong>.
+        </p>
+      </section>
+
+      <!-- Barra de Búsqueda y Filtros por Categoría -->
+      <section class="mb-4">
+        <app-filtros></app-filtros>
+      </section>
+
+      <!-- Cuadrícula de Productos (Catálogo) -->
+      <section class="mb-5">
+        <app-catalogo (seleccionarHerramienta)="abrirReserva($event)"></app-catalogo>
+      </section>
+
+      <!-- Bloque Inferior Informativo: Condiciones del Servicio -->
+      <section class="reglamento-summary-block p-4 rounded-3 border mb-5">
+        <div class="row g-4 align-items-center">
+          <div class="col-12 col-md-8">
+            <h3 class="fs-6 fw-bold text-dark text-uppercase mb-2 d-flex align-items-center gap-2">
+              <i class="bi bi-shield-check text-primary fs-5"></i>
+              Condiciones de Uso del Instrumental Técnico (Regional 1)
+            </h3>
+            <ul class="text-secondary small m-0 ps-3 leading-relaxed">
+              <li><strong>Plazo máximo:</strong> Préstamo de hasta 3 días corridos por solicitud.</li>
+              <li><strong>Límite por matriculado:</strong> Hasta 2 equipos en simultáneo por profesional habilitado.</li>
+              <li><strong>Retiro y devolución:</strong> Exclusivamente en la sede activa seleccionada en días y horarios de atención.</li>
+              <li><strong>Responsabilidad:</strong> Los equipos se entregan calibrados y testeados bajo Contrato de Comodato.</li>
+            </ul>
+          </div>
+          <div class="col-12 col-md-4 text-md-end">
+            <button
+              type="button"
+              class="btn btn-outline-secondary btn-sm"
+              (click)="abrirComodato()">
+              <i class="bi bi-file-earmark-text me-1"></i> Leer Contrato de Comodato
+            </button>
+          </div>
+        </div>
+      </section>
+
+    </div>
+  </main>
+
+  <!-- Footer Institucional -->
+  <footer class="footer-capc py-4 border-top bg-white">
+    <div class="container-xl d-flex flex-column flex-md-row justify-content-between align-items-center gap-3 text-secondary text-xs">
+      <div class="d-flex align-items-center gap-3">
+        <img src="assets/logo-carq-cba.png" alt="CAPC R1" style="height: 32px;" class="opacity-75">
+        <div>
+          <span class="fw-semibold text-dark d-block">Colegio de Arquitectos de la Provincia de Córdoba</span>
+          <span>Regional 1 · Laprida 40, Córdoba Capital</span>
+        </div>
+      </div>
+      <div class="text-center text-md-end">
+        <span>Caja de Herramientas R1 · Versión 1.0 (Funcionalidades Esenciales)</span>
+        <div class="text-muted mt-1">Desarrollado para matriculados de la Regional 1</div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Panel Lateral / Modal de Reserva (Drawer) -->
+  <app-reserva-drawer
+    [visible]="drawerVisible()"
+    [herramienta]="herramientaSeleccionada()"
+    (cerrar)="cerrarDrawer()"
+    (verComodato)="abrirComodato()"
+    (reservaConfirmada)="onReservaConfirmada($event)">
+  </app-reserva-drawer>
+
+  <!-- Modal de Contrato de Comodato -->
+  <app-comodato-modal
+    [visible]="comodatoModalVisible()"
+    (cerrar)="cerrarComodato()">
+  </app-comodato-modal>
+
+  <!-- Modal de Mis Reservas Activas -->
+  <app-mis-reservas-modal
+    [visible]="misReservasModalVisible()"
+    (cerrar)="cerrarMisReservas()">
+  </app-mis-reservas-modal>
+
+  <!-- Botón Flotante de WhatsApp (#25D366) -->
+  <app-whatsapp-button></app-whatsapp-button>
+
+</div>

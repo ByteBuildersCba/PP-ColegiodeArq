@@ -1,0 +1,52 @@
+.drawer-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(15, 23, 42, 0.45);
+  backdrop-filter: blur(2px);
+  z-index: 1040;
+}
+
+.drawer-container {
+  position: fixed;
+  top: 0;
+  right: 0;
+  width: 100%;
+  max-width: 480px;
+  height: 100vh;
+  background-color: #FFFFFF;
+  z-index: 1050;
+  display: flex;
+  flex-direction: column;
+}
+
+.equipment-thumb {
+  width: 72px;
+  height: 72px;
+}
+
+.text-xs {
+  font-size: 0.75rem;
+}
+
+.comodato-agreement-box {
+  background-color: #faf9f6;
+  border-color: #e5e3df !important;
+}
+
+.success-icon-wrapper {
+  animation: scaleIn 0.3s ease-out;
+}
+
+@keyframes scaleIn {
+  0% { transform: scale(0.6); opacity: 0; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+@media (max-width: 576px) {
+  .drawer-container {
+    max-width: 100%;
+  }
+}

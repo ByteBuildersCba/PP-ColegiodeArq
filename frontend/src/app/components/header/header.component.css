@@ -1,0 +1,161 @@
+.header-main {
+  background-color: #FFFFFF;
+  position: sticky;
+  top: 0;
+  z-index: 1020;
+}
+
+.nav-institucional {
+  background-color: #FFFFFF;
+}
+
+.logo-img {
+  height: 48px;
+  max-height: 52px;
+  width: auto;
+  object-fit: contain;
+}
+
+.menu-links {
+  margin: 0;
+  padding: 0;
+}
+
+.nav-item-link {
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #1f2937;
+  text-decoration: none;
+  padding: 0.5rem 0.75rem;
+  border-radius: 4px;
+  transition: all 0.15s ease-in-out;
+  border: none;
+  background: transparent;
+}
+
+.nav-item-link:hover {
+  color: var(--capc-blue);
+  background-color: #f3f4f6;
+}
+
+.nav-item-link.active-link {
+  color: var(--capc-blue);
+  font-weight: 800;
+}
+
+.btn-autogestion {
+  background-color: var(--capc-blue) !important;
+  color: #FFFFFF !important;
+}
+
+.btn-autogestion:hover {
+  background-color: var(--capc-blue-hover) !important;
+}
+
+.btn-junta {
+  background-color: #e5e7eb !important;
+  color: #1f2937 !important;
+}
+
+.btn-junta:hover {
+  background-color: #d1d5db !important;
+}
+
+/* Menú Desplegable HERRAMIENTAS - Con fondo #E5E3DF especificado por el usuario */
+.menu-desplegable-herramientas {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  background-color: #E5E3DF !important;
+  min-width: 260px;
+  border-radius: 6px;
+  padding: 0.5rem 0;
+  margin-top: 0.35rem;
+  border: 1px solid #d4d1cb;
+  z-index: 1050;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.12);
+}
+
+.dropdown-header-title {
+  font-size: 0.7rem;
+  font-weight: 800;
+  color: #55534e;
+  padding: 0.4rem 1rem;
+  letter-spacing: 0.05em;
+}
+
+.dropdown-link-item {
+  display: block;
+  padding: 0.55rem 1rem;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: #2b2926;
+  text-decoration: none;
+  transition: background-color 0.15s ease;
+}
+
+.dropdown-link-item:hover {
+  background-color: #d8d5d0;
+  color: var(--capc-blue);
+}
+
+.active-dropdown-item {
+  background-color: rgba(0, 75, 135, 0.08);
+  color: var(--capc-blue);
+  font-weight: 700;
+}
+
+/* Sub-Bar Informativa */
+.sub-bar-info {
+  background-color: #fbfbfb;
+  border-color: #eae8e3 !important;
+  font-size: 0.78rem;
+}
+
+.select-custom-sede {
+  font-size: 0.78rem;
+  font-weight: 600;
+  padding-top: 0.25rem;
+  padding-bottom: 0.25rem;
+  width: auto;
+  border-color: #d1cfc9;
+  background-color: #ffffff;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.select-custom-sede:focus {
+  border-color: var(--capc-blue);
+  box-shadow: 0 0 0 2px rgba(0, 75, 135, 0.15);
+}
+
+.badge-matricula-habilitada {
+  background-color: rgba(25, 135, 84, 0.1);
+  color: #15803d;
+  font-weight: 600;
+  font-size: 0.75rem;
+  padding: 0.25rem 0.6rem;
+  border-radius: 4px;
+  border: 1px solid rgba(25, 135, 84, 0.2);
+}
+
+.btn-icon-search {
+  border: 1px solid #e5e7eb;
+  color: #4b5563;
+  padding: 0.35rem 0.65rem;
+  border-radius: 6px;
+  background-color: #ffffff;
+}
+
+.btn-icon-search:hover {
+  color: var(--capc-blue);
+  border-color: var(--capc-blue);
+}
+
+.mis-reservas-pill {
+  font-size: 0.78rem;
+  font-weight: 600;
+  border-radius: 6px;
+}

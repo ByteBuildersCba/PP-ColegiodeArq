@@ -1,0 +1,66 @@
+<div class="filtros-container bg-white rounded-3 p-3 p-sm-4 shadow-sm border border-light-subtle">
+  <!-- Fila superior: Input de búsqueda y contador de reservas activas -->
+  <div class="d-flex flex-column flex-sm-row align-items-sm-center justify-content-between gap-3 mb-3">
+    <!-- Buscador Principal -->
+    <div class="search-input-wrapper position-relative flex-grow-1">
+      <i class="bi bi-search search-icon position-absolute text-muted"></i>
+      <input
+        type="search"
+        class="form-control search-input ps-5 py-2"
+        placeholder="Buscar herramienta..."
+        [value]="query"
+        (input)="onSearch($event)"
+        aria-label="Buscar herramienta en catálogo"
+      />
+      @if (query) {
+        <button
+          type="button"
+          class="btn btn-sm btn-clear-search position-absolute end-0 top-50 translate-middle-y me-2 text-muted"
+          (click)="limpiarBusqueda()"
+          title="Limpiar búsqueda">
+          <i class="bi bi-x-circle-fill"></i>
+        </button>
+      }
+    </div>
+
+    <!-- Indicador de Reservas Activas (0 de 2) -->
+    <div class="reservas-quota-badge d-flex align-items-center gap-2 px-3 py-2 rounded-2">
+      <i class="bi bi-shield-check text-primary"></i>
+      <span class="text-secondary small">Reservas activas:</span>
+      <span class="fw-bold text-dark fs-6">
+        {{ herramientasService.reservasActivasCount() }} de 2
+      </span>
+    </div>
+  </div>
+
+  <!-- Fila inferior: Botones de filtro por categoría -->
+  <div class="d-flex flex-wrap gap-2 pt-2 border-top border-light-subtle" role="group" aria-label="Filtrar por categoría">
+    @for (cat of herramientasService.categorias(); track cat.id) {
+      <button
+        type="button"
+        class="btn btn-categoria-filter"
+        [class.active]="herramientasService.categoriaSeleccionada() === cat.nombre"
+        (click)="seleccionarCategoria(cat.nombre)">
+        {{ cat.nombre }}
+      </button>
+    }
+  </div>
+</div>
+
+<!-- Contador de resultados -->
+<div class="d-flex align-items-center justify-content-between mt-4 mb-3 px-1">
+  <p class="text-muted small m-0 fw-medium">
+    <strong class="text-dark">{{ herramientasService.herramientasFiltradas().length }}</strong>
+    equipos disponibles
+    @if (herramientasService.categoriaSeleccionada() !== 'Todas') {
+      en <span class="badge bg-secondary-subtle text-secondary-emphasis">{{ herramientasService.categoriaSeleccionada() }}</span>
+    }
+    @if (query) {
+      coincidiendo con "<span class="fst-italic text-dark">{{ query }}</span>"
+    }
+  </p>
+
+  <span class="badge bg-light text-secondary border">
+    Retiro en: {{ herramientasService.sedeSeleccionada().nombre }}
+  </span>
+</div>

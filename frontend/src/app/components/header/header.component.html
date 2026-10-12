@@ -1,0 +1,109 @@
+<header class="header-main">
+  <!-- Barra de Navegación Principal Institucional -->
+  <div class="nav-institucional">
+    <div class="container-xl d-flex align-items-center justify-content-between py-3">
+      <!-- Logo CAPC Regional 1 -->
+      <a href="#" class="brand-logo d-flex align-items-center text-decoration-none">
+        <img src="assets/logo-carq-cba.png" alt="Colegio de Arquitectos de la Provincia de Córdoba" class="img-fluid logo-img">
+      </a>
+
+      <!-- Menú de enlaces institucionales -->
+      <nav class="d-none d-lg-flex align-items-center gap-1 menu-links">
+        <a href="#" class="nav-item-link">El Colegio <i class="bi bi-chevron-down ms-1 text-muted"></i></a>
+        <a href="#" class="nav-item-link btn-autogestion">Autogestión</a>
+        <a href="#" class="nav-item-link">Ejercicio P. <i class="bi bi-chevron-down ms-1 text-muted"></i></a>
+        <a href="#" class="nav-item-link">Novedades <i class="bi bi-chevron-down ms-1 text-muted"></i></a>
+
+        <!-- Menú Desplegable HERRAMIENTAS con fondo #E5E3DF -->
+        <div class="dropdown-herramientas-container position-relative">
+          <button
+            type="button"
+            class="nav-item-link active-link d-flex align-items-center"
+            (click)="toggleMenuHerramientas()"
+            [attr.aria-expanded]="menuHerramientasAbierto">
+            Herramientas <i class="bi bi-chevron-down ms-1"></i>
+          </button>
+
+          @if (menuHerramientasAbierto) {
+            <div class="menu-desplegable-herramientas shadow-sm animate__animated animate__fadeIn">
+              <div class="dropdown-header-title">CAJA DE HERRAMIENTAS R1</div>
+              <a href="#" class="dropdown-link-item active-dropdown-item" (click)="$event.preventDefault(); menuHerramientasAbierto = false">
+                <i class="bi bi-tools me-2 text-primary"></i> Catálogo de Equipos e Instrumental
+              </a>
+              <a href="#" class="dropdown-link-item" (click)="$event.preventDefault(); menuHerramientasAbierto = false; abrirMisReservas.emit()">
+                <i class="bi bi-calendar2-check me-2 text-primary"></i> Mis Reservas Activas
+              </a>
+              <a href="#" class="dropdown-link-item" (click)="$event.preventDefault(); menuHerramientasAbierto = false">
+                <i class="bi bi-file-earmark-text me-2 text-primary"></i> Contrato de Comodato
+              </a>
+              <div class="dropdown-divider my-1"></div>
+              <a href="#" class="dropdown-link-item" (click)="$event.preventDefault(); menuHerramientasAbierto = false">
+                <i class="bi bi-question-circle me-2 text-primary"></i> Reglamento de Uso
+              </a>
+            </div>
+          }
+        </div>
+
+        <a href="#" class="nav-item-link btn-junta">Junta Electoral</a>
+        <a href="#" class="nav-item-link">Contacto</a>
+      </nav>
+
+      <!-- Botón de búsqueda de sitio / Mis Reservas -->
+      <div class="d-flex align-items-center gap-2">
+        <button
+          type="button"
+          class="btn btn-sm btn-outline-secondary d-none d-sm-inline-flex align-items-center gap-1 mis-reservas-pill"
+          (click)="abrirMisReservas.emit()"
+          title="Ver mis reservas">
+          <i class="bi bi-clock-history"></i>
+          <span>Mis Reservas</span>
+          <span class="badge bg-primary rounded-pill ms-1">{{ herramientasService.reservasActivasCount() }}/2</span>
+        </button>
+        <button type="button" class="btn btn-icon-search" aria-label="Buscar en el portal">
+          <i class="bi bi-search"></i>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Barra Informativa y Selector de Sede Activa -->
+  <div class="sub-bar-info border-top border-bottom">
+    <div class="container-xl d-flex flex-column flex-md-row justify-content-between align-items-md-center py-2 gap-2 text-xs">
+      
+      <!-- Sede Activa y Horarios -->
+      <div class="d-flex flex-wrap align-items-center gap-3 gap-md-4">
+        <!-- Selector de Sede -->
+        <div class="d-flex align-items-center gap-2 sede-selector-group">
+          <i class="bi bi-geo-alt-fill text-primary"></i>
+          <label for="select-sede" class="fw-bold text-uppercase text-dark tracking-wide">Sede</label>
+          <select
+            id="select-sede"
+            class="form-select form-select-sm select-custom-sede"
+            [value]="herramientasService.sedeSeleccionada().id"
+            (change)="onSedeChange($event)">
+            @for (sede of herramientasService.sedes(); track sede.id) {
+              <option [value]="sede.id">{{ sede.nombre }}</option>
+            }
+          </select>
+        </div>
+
+        <!-- Horario de Atención de la Sede -->
+        <div class="d-flex align-items-center gap-2 horario-atencion">
+          <i class="bi bi-clock-fill text-primary"></i>
+          <span class="fw-bold text-uppercase text-dark tracking-wide">Atención</span>
+          <span class="text-secondary">{{ herramientasService.sedeSeleccionada().horario_atencion }}</span>
+        </div>
+      </div>
+
+      <!-- Datos del Matriculado y Estado -->
+      <div class="d-flex align-items-center gap-2 user-matriculado-info">
+        <span class="fw-semibold text-dark">{{ herramientasService.matriculado().nombre_completo }}</span>
+        <span class="badge-matricula-habilitada d-inline-flex align-items-center gap-1">
+          <i class="bi bi-patch-check-fill text-success"></i>
+          <span>{{ herramientasService.matriculado().estado_matricula }}</span>
+        </span>
+      </div>
+
+    </div>
+  </div>
+</header>

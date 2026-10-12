@@ -1,0 +1,72 @@
+export interface Sede {
+  id: number;
+  nombre: string;
+  slug: string;
+  direccion: string;
+  horario_atencion: string;
+  telefono: string;
+  email: string;
+}
+
+export interface Categoria {
+  id: number;
+  nombre: string;
+  slug: string;
+  orden?: number;
+}
+
+export interface Herramienta {
+  id: number;
+  nombre: string;
+  slug: string;
+  categoria?: number;
+  categoria_nombre: string;
+  categoria_slug: string;
+  sede_nombre?: string;
+  descripcion: string;
+  especificaciones?: string;
+  imagen: string;
+  stock_total: number;
+  stock_disponible: number;
+  requiere_capacitacion: boolean;
+  aviso_capacitacion: string;
+  dias_max_prestamo: number;
+  activa: boolean;
+}
+
+export interface Matriculado {
+  id: number;
+  nombre_completo: string;
+  numero_matricula: string;
+  estado_matricula: string;
+  email: string;
+  telefono: string;
+  habilitado: boolean;
+  capacitaciones_aprobadas?: string[];
+  reservas_activas_count: number;
+}
+
+export interface Reserva {
+  id?: number;
+  codigo: string;
+  matriculado_id?: number;
+  matriculado?: Matriculado;
+  herramienta: Herramienta;
+  sede: Sede;
+  fecha_inicio: string;
+  fecha_devolucion: string;
+  dias_solicitados: number;
+  comodato_aceptado: boolean;
+  estado: 'CONFIRMADA' | 'RETIRADA' | 'DEVUELTA' | 'CANCELADA';
+  fecha_creacion: string;
+  observaciones?: string;
+}
+
+export interface ReservaPayload {
+  matriculado: number;
+  herramienta: number;
+  sede: number;
+  fecha_inicio: string;
+  fecha_devolucion: string;
+  comodato_aceptado: boolean;
+}

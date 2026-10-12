@@ -1,0 +1,235 @@
+@if (visible) {
+  <!-- Backdrop -->
+  <div class="drawer-backdrop" (click)="onCerrar()"></div>
+
+  <!-- Panel Lateral / Drawer -->
+  <div class="drawer-container shadow-lg d-flex flex-column animate__animated animate__slideInRight">
+    
+    <!-- Encabezado del Drawer -->
+    <div class="drawer-header d-flex align-items-center justify-content-between p-3 p-sm-4 border-bottom bg-white">
+      <div>
+        <h2 class="fs-5 fw-bold text-dark m-0 d-flex align-items-center gap-2">
+          <i class="bi bi-calendar2-check text-primary"></i>
+          <span>Reserva de Equipo</span>
+        </h2>
+        <span class="text-muted small">Caja de Herramientas Regional 1</span>
+      </div>
+      <button type="button" class="btn-close" aria-label="Cerrar panel" (click)="onCerrar()"></button>
+    </div>
+
+    <!-- Contenido del Drawer -->
+    <div class="drawer-body p-3 p-sm-4 flex-grow-1 overflow-y-auto">
+
+      @if (!reservaExitosa) {
+        <!-- Ficha del Equipo Seleccionado -->
+        @if (herramienta) {
+          <div class="selected-equipment-card d-flex gap-3 p-3 rounded-3 mb-4 bg-light border">
+            <img
+              [src]="herramienta.imagen"
+              [alt]="herramienta.nombre"
+              class="rounded-2 object-fit-cover equipment-thumb"
+              (error)="herramienta.imagen = 'assets/equipos/default.png'"
+            />
+            <div class="d-flex flex-column justify-content-center">
+              <span class="badge bg-secondary text-uppercase mb-1 align-self-start font-monospace text-xs">
+                {{ herramienta.categoria_nombre }}
+              </span>
+              <h3 class="fs-6 fw-bold text-dark m-0">{{ herramienta.nombre }}</h3>
+              <span class="text-muted small mt-1">
+                Stock actual: <strong>{{ herramienta.stock_disponible }} un.</strong>
+              </span>
+            </div>
+          </div>
+        }
+
+        <!-- Alerta Informativa: Puedes solicitar hasta 2 equipos en simultáneo -->
+        <div class="alert alert-info d-flex align-items-start gap-2 py-2.5 px-3 rounded-3 mb-4" role="alert">
+          <i class="bi bi-info-circle-fill text-primary fs-5 mt-1 shrink-0"></i>
+          <div class="small">
+            <strong class="d-block text-dark">Límite de solicitudes</strong>
+            Puedes solicitar hasta <strong>2 equipos en simultáneo</strong>.
+            Actualmente tienes <strong>{{ herramientasService.reservasActivasCount() }}</strong> reservas activas.
+          </div>
+        </div>
+
+        <!-- Lugar de retiro (Sede) -->
+        <div class="mb-4 p-3 rounded-3 bg-white border">
+          <div class="d-flex align-items-center gap-2 mb-1">
+            <i class="bi bi-geo-alt-fill text-primary"></i>
+            <span class="fw-bold text-dark small text-uppercase">Sede de Retiro y Devolución</span>
+          </div>
+          <p class="m-0 text-dark fw-semibold small">{{ herramientasService.sedeSeleccionada().nombre }}</p>
+          <p class="m-0 text-muted text-xs">{{ herramientasService.sedeSeleccionada().direccion }}</p>
+          <div class="text-xs text-primary mt-1 fw-medium">
+            <i class="bi bi-clock me-1"></i>{{ herramientasService.sedeSeleccionada().horario_atencion }}
+          </div>
+        </div>
+
+        <!-- Selección de Fechas de Préstamo (Máximo 3 días) -->
+        <div class="mb-4">
+          <label class="form-label fw-bold text-dark small text-uppercase d-flex justify-content-between align-items-center">
+            <span>Período de Préstamo</span>
+            <span class="badge bg-primary-subtle text-primary border border-primary-subtle">
+              Máximo 3 días
+            </span>
+          </label>
+
+          <div class="row g-2">
+            <div class="col-6">
+              <label for="fecha-inicio" class="text-xs text-secondary mb-1 d-block">Fecha de Retiro</label>
+              <input
+                id="fecha-inicio"
+                type="date"
+                class="form-control form-control-sm"
+                [min]="minFechaInicio"
+                [(ngModel)]="fechaInicio"
+                (change)="onFechaInicioChange()"
+              />
+            </div>
+            <div class="col-6">
+              <label for="fecha-devolucion" class="text-xs text-secondary mb-1 d-block">Fecha de Devolución</label>
+              <input
+                id="fecha-devolucion"
+                type="date"
+                class="form-control form-control-sm"
+                [min]="minFechaDevolucion"
+                [max]="maxFechaDevolucion"
+                [(ngModel)]="fechaDevolucion"
+              />
+            </div>
+          </div>
+
+          <!-- Indicador de duración calculada -->
+          <div class="d-flex align-items-center justify-content-between mt-2 px-1">
+            <span class="text-xs text-muted">Duración solicitada:</span>
+            <span
+              class="badge text-xs"
+              [class.bg-success-subtle]="diasCalculados > 0 && diasCalculados <= 3"
+              [class.text-success-emphasis]="diasCalculados > 0 && diasCalculados <= 3"
+              [class.bg-danger-subtle]="diasCalculados > 3 || diasCalculados <= 0"
+              [class.text-danger-emphasis]="diasCalculados > 3 || diasCalculados <= 0">
+              {{ diasCalculados }} {{ diasCalculados === 1 ? 'día' : 'días' }} (máx. 3)
+            </span>
+          </div>
+
+          @if (diasExcedidos) {
+            <div class="text-danger text-xs mt-1">
+              <i class="bi bi-exclamation-triangle-fill me-1"></i>
+              El préstamo no puede superar el límite reglamentario de 3 días.
+            </div>
+          }
+        </div>
+
+        <!-- Requisito de capacitación previa si aplica -->
+        @if (herramienta?.requiere_capacitacion) {
+          <div class="alert alert-warning d-flex align-items-start gap-2 py-2 px-3 rounded-2 mb-4" role="alert">
+            <i class="bi bi-mortarboard-fill text-warning-emphasis fs-5 shrink-0 mt-1"></i>
+            <div class="small">
+              <strong class="d-block text-warning-emphasis">Instrumental con capacitación técnica</strong>
+              Declaro poseer la habilitación o capacitación requerida para la manipulación segura de este equipo.
+            </div>
+          </div>
+        }
+
+        <!-- Checkbox de Aceptación del Contrato de Comodato -->
+        <div class="mb-4 comodato-agreement-box p-3 rounded-3 border">
+          <div class="form-check">
+            <input
+              class="form-check-input"
+              type="checkbox"
+              id="check-comodato"
+              [(ngModel)]="comodatoAceptado"
+            />
+            <label class="form-check-label text-dark small" for="check-comodato">
+              Acepto los términos y obligaciones del
+              <a href="#" class="fw-bold text-decoration-underline text-primary" (click)="$event.preventDefault(); verComodato.emit()">
+                Contrato de Comodato de Instrumental Técnico
+              </a>
+              del Colegio de Arquitectos de Córdoba (R1).
+            </label>
+          </div>
+          <div class="text-muted text-xs mt-2 ms-4">
+            El comodatario asume la responsabilidad civil por el cuidado, custodia y devolución en término de las herramientas.
+          </div>
+        </div>
+
+        <!-- Mensajes de Error si existen -->
+        @if (errorMensaje) {
+          <div class="alert alert-danger py-2 px-3 text-xs mb-3 rounded-2" role="alert">
+            <i class="bi bi-x-circle-fill me-1"></i> {{ errorMensaje }}
+          </div>
+        }
+
+      } @else {
+        <!-- Estado Exitoso tras Confirmar -->
+        <div class="reserva-exitosa-view text-center py-4">
+          <div class="success-icon-wrapper mb-3">
+            <i class="bi bi-check-circle-fill text-success fs-1"></i>
+          </div>
+          <h3 class="fs-4 fw-bold text-dark mb-1">¡Reserva Confirmada!</h3>
+          <p class="text-secondary small mb-4">
+            Tu solicitud de préstamo ha sido registrada exitosamente en el sistema de la Regional 1.
+          </p>
+
+          <div class="card bg-light border p-3 mb-4 text-start">
+            <div class="d-flex justify-content-between align-items-center mb-2 pb-2 border-bottom">
+              <span class="text-muted text-xs">CÓDIGO DE RESERVA</span>
+              <span class="badge bg-primary fs-6 font-monospace">{{ reservaExitosa.codigo }}</span>
+            </div>
+            <div class="mb-2">
+              <span class="text-muted text-xs d-block">EQUIPO</span>
+              <strong class="text-dark small">{{ reservaExitosa.herramienta.nombre }}</strong>
+            </div>
+            <div class="mb-2">
+              <span class="text-muted text-xs d-block">SEDE DE RETIRO</span>
+              <strong class="text-dark small">{{ reservaExitosa.sede.nombre }}</strong>
+              <div class="text-xs text-muted">{{ reservaExitosa.sede.horario_atencion }}</div>
+            </div>
+            <div class="row g-2">
+              <div class="col-6">
+                <span class="text-muted text-xs d-block">FECHA DE RETIRO</span>
+                <strong class="text-dark small">{{ reservaExitosa.fecha_inicio }}</strong>
+              </div>
+              <div class="col-6">
+                <span class="text-muted text-xs d-block">FECHA DE DEVOLUCIÓN</span>
+                <strong class="text-dark small">{{ reservaExitosa.fecha_devolucion }}</strong>
+              </div>
+            </div>
+          </div>
+
+          <p class="text-muted text-xs mb-4">
+            Recibirás los detalles en tu correo institucional. Presentá tu credencial o matrícula al retirar el equipo en mostrador.
+          </p>
+        </div>
+      }
+
+    </div>
+
+    <!-- Pie del Drawer con el Botón Grande -->
+    <div class="drawer-footer p-3 p-sm-4 border-top bg-white">
+      @if (!reservaExitosa) {
+        <button
+          type="button"
+          class="btn btn-capc-primary btn-lg w-100 py-3 fw-bold d-flex align-items-center justify-content-center gap-2"
+          [disabled]="!comodatoAceptado || diasExcedidos || diasCalculados <= 0 || cargando || !herramientasService.puedeReservar()"
+          (click)="confirmar()">
+          @if (cargando) {
+            <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+            <span>Procesando...</span>
+          } @else {
+            <i class="bi bi-check2-circle fs-5"></i>
+            <span>Confirmar Reserva</span>
+          }
+        </button>
+      } @else {
+        <button
+          type="button"
+          class="btn btn-secondary w-100 py-2.5 fw-semibold"
+          (click)="onCerrar()">
+          Cerrar
+        </button>
+      }
+    </div>
+
+  </div>
+}

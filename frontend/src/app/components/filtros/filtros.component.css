@@ -1,0 +1,71 @@
+.filtros-container {
+  border-color: #e5e3df !important;
+}
+
+.search-input-wrapper {
+  max-width: 100%;
+}
+
+.search-icon {
+  left: 16px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 1rem;
+}
+
+.search-input {
+  font-size: 0.92rem;
+  border-color: #d1cfc9;
+  border-radius: 8px;
+  background-color: #fafafa;
+  transition: all 0.2s ease;
+}
+
+.search-input:focus {
+  background-color: #ffffff;
+  border-color: var(--capc-blue);
+  box-shadow: 0 0 0 3px rgba(0, 75, 135, 0.12);
+}
+
+.btn-clear-search {
+  background: transparent;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+}
+
+.btn-clear-search:hover {
+  color: #1f2937 !important;
+}
+
+.reservas-quota-badge {
+  background-color: #f8f9fa;
+  border: 1px solid #e9ecef;
+  white-space: nowrap;
+}
+
+.btn-categoria-filter {
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  padding: 0.45rem 0.95rem;
+  border-radius: 6px;
+  border: 1px solid #d4d1cb;
+  background-color: #ffffff;
+  color: #374151;
+  transition: all 0.15s ease-in-out;
+}
+
+.btn-categoria-filter:hover {
+  border-color: var(--capc-blue);
+  color: var(--capc-blue);
+  background-color: #f8fafc;
+}
+
+.btn-categoria-filter.active {
+  background-color: #374151;
+  color: #ffffff;
+  border-color: #374151;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.12);
+}

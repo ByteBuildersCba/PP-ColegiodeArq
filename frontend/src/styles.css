@@ -1,0 +1,123 @@
+:root {
+  --capc-blue: #004b87;
+  --capc-blue-hover: #003865;
+  --capc-blue-light: #edf4fa;
+  --capc-bg-light: #EFEFEF;
+  --capc-menu-gray: #E5E3DF;
+  --capc-header-white: #FFFFFF;
+  --capc-whatsapp: #25D366;
+  --capc-whatsapp-hover: #20bd5a;
+  --capc-text-dark: #1b2128;
+  --capc-text-muted: #64748b;
+  --capc-border: #dedcd7;
+  --capc-border-subtle: #eae8e3;
+  --capc-success: #198754;
+  --capc-card-bg: #FFFFFF;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  font-family: 'Work Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  background-color: var(--capc-bg-light);
+  color: var(--capc-text-dark);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #c5c3be;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #9e9c97;
+}
+
+/* Custom Utilities */
+.btn-capc-primary {
+  background-color: var(--capc-blue);
+  color: #ffffff;
+  border: 1px solid var(--capc-blue);
+  font-weight: 600;
+  text-transform: uppercase;
+  font-size: 0.82rem;
+  letter-spacing: 0.04em;
+  padding: 0.65rem 1.25rem;
+  border-radius: 0.4rem;
+  transition: all 0.2s ease-in-out;
+}
+
+.btn-capc-primary:hover,
+.btn-capc-primary:focus {
+  background-color: var(--capc-blue-hover);
+  border-color: var(--capc-blue-hover);
+  color: #ffffff;
+  box-shadow: 0 4px 12px rgba(0, 75, 135, 0.25);
+}
+
+.btn-capc-primary:disabled {
+  background-color: #8da4be;
+  border-color: #8da4be;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+.badge-capacitacion {
+  background-color: #fff8e6;
+  color: #925c00;
+  border-left: 3px solid #f59e0b;
+  font-size: 0.76rem;
+  font-weight: 600;
+  padding: 0.45rem 0.65rem;
+  border-radius: 0 0.3rem 0.3rem 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+/* WhatsApp Floating Button */
+.whatsapp-floating-btn {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  width: 58px;
+  height: 58px;
+  background-color: var(--capc-whatsapp);
+  color: #ffffff;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 30px;
+  box-shadow: 0 4px 18px rgba(37, 211, 102, 0.45);
+  transition: all 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  z-index: 1050;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.whatsapp-floating-btn:hover {
+  background-color: var(--capc-whatsapp-hover);
+  color: #ffffff;
+  transform: scale(1.08) translateY(-2px);
+  box-shadow: 0 8px 24px rgba(37, 211, 102, 0.55);
+}
+
+.whatsapp-floating-btn:active {
+  transform: scale(0.96);
+}

@@ -1,0 +1,96 @@
+<div class="row g-4 catalog-grid">
+  @for (herramienta of herramientasService.herramientasFiltradas(); track herramienta.id) {
+    <div class="col-12 col-md-6 col-lg-4 col-xl-3 d-flex">
+      <div class="card card-herramienta flex-fill border-0 shadow-sm d-flex flex-column">
+        
+        <!-- Contenedor de Imagen y Badge de Categoría -->
+        <div class="img-wrapper position-relative overflow-hidden">
+          <img
+            [src]="herramienta.imagen"
+            [alt]="herramienta.nombre"
+            class="card-img-top img-equipo"
+            loading="lazy"
+            (error)="herramienta.imagen = 'assets/equipos/default.png'"
+          />
+          <span class="badge-categoria-overlay position-absolute top-0 start-0">
+            {{ herramienta.categoria_nombre }}
+          </span>
+
+          @if (herramienta.stock_disponible === 0) {
+            <div class="overlay-sin-stock position-absolute top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center">
+              <span class="badge bg-danger text-uppercase px-3 py-2 fw-bold">Sin Stock</span>
+            </div>
+          }
+        </div>
+
+        <!-- Cuerpo de la Tarjeta -->
+        <div class="card-body d-flex flex-column p-4">
+          <!-- Nombre del equipo -->
+          <h3 class="card-title fs-5 fw-bold text-dark mb-2 text-balance">
+            {{ herramienta.nombre }}
+          </h3>
+
+          <!-- Descripción corta -->
+          <p class="card-text text-secondary small flex-grow-1 mb-3">
+            {{ herramienta.descripcion }}
+          </p>
+
+          <!-- Stock disponible -->
+          <div class="d-flex align-items-center gap-2 mb-2 stock-indicator">
+            <i class="bi bi-box-seam text-primary fs-6"></i>
+            <span class="fw-semibold text-dark small">
+              Stock: {{ herramienta.stock_disponible }}
+              {{ herramienta.stock_disponible === 1 ? 'unidad' : 'unidades' }}
+            </span>
+            @if (herramienta.stock_disponible > 0 && herramienta.stock_disponible <= 2) {
+              <span class="badge bg-warning-subtle text-warning-emphasis ms-auto small">Últimas</span>
+            }
+          </div>
+
+          <!-- Aviso especial si requiere capacitación previa -->
+          @if (herramienta.requiere_capacitacion) {
+            <div class="badge-capacitacion mb-3">
+              <i class="bi bi-mortarboard-fill"></i>
+              <span>{{ herramienta.aviso_capacitacion || 'Requiere capacitación previa' }}</span>
+            </div>
+          }
+
+          <!-- Botón primario: Reservar Equipo -->
+          <div class="mt-auto pt-2">
+            <button
+              type="button"
+              class="btn btn-capc-primary w-100 d-flex align-items-center justify-content-center gap-2"
+              [disabled]="herramienta.stock_disponible <= 0 || !herramientasService.puedeReservar()"
+              (click)="onReservar(herramienta)"
+              [title]="!herramientasService.puedeReservar() ? 'Has alcanzado el límite de 2 reservas activas' : 'Reservar este equipo'">
+              <i class="bi bi-calendar-plus"></i>
+              <span>Reservar Equipo</span>
+            </button>
+
+            @if (!herramientasService.puedeReservar() && herramienta.stock_disponible > 0) {
+              <p class="text-danger small text-center mt-1 mb-0 quota-limit-msg">
+                Límite de 2 reservas alcanzado
+              </p>
+            }
+          </div>
+
+        </div>
+
+      </div>
+    </div>
+  } @empty {
+    <div class="col-12 py-5 text-center empty-state bg-white rounded-3 shadow-sm border border-light-subtle">
+      <i class="bi bi-search fs-1 text-muted mb-3 d-block"></i>
+      <h4 class="fw-bold text-dark">No se encontraron equipos</h4>
+      <p class="text-secondary max-w-md mx-auto mb-4">
+        No hay herramientas que coincidan con los filtros seleccionados o tu búsqueda actual.
+      </p>
+      <button
+        type="button"
+        class="btn btn-outline-primary"
+        (click)="herramientasService.setCategoria('Todas'); herramientasService.setBusqueda('')">
+        Restablecer filtros
+      </button>
+    </div>
+  }
+</div>

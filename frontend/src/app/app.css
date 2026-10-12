@@ -1,0 +1,24 @@
+.app-layout {
+  background-color: #EFEFEF;
+}
+
+.main-content {
+  background-color: #EFEFEF; /* Gris Claro de Sección requerido: HEX #EFEFEF */
+}
+
+.page-title-section {
+  border-color: #dedcd7 !important;
+}
+
+.text-xs {
+  font-size: 0.75rem;
+}
+
+.reglamento-summary-block {
+  background-color: #EFEFEF; /* Bloque inferior: HEX #EFEFEF */
+  border-color: #dedcd7 !important;
+}
+
+.footer-capc {
+  border-color: #dedcd7 !important;
+}
